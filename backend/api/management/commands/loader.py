@@ -19,5 +19,4 @@ class Command(BaseCommand):
                 name, unit = row
                 Ingredient.objects.get_or_create(
                     name=name, measurement_unit=unit)
-                print(f'Добавляю: {name}...')
-        print('Done!')
+        self.stdout.write(self.style.SUCCESS('Done!'))

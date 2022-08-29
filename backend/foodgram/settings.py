@@ -8,9 +8,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.environ.get('SECRET_KEY', default='set_secret_key_in.env_file')
 
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', default='False')
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', default=['localhost'])
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -108,7 +108,6 @@ DJOSER = {
         'user_list': ('rest_framework.permissions.AllowAny',)
     }
 }
-
 
 LANGUAGE_CODE = 'ru'
 TIME_ZONE = 'Europe/Moscow'

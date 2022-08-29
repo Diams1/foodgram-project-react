@@ -1,12 +1,14 @@
 from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import get_object_or_404
-
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
-from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
-                            Shopping, Tag)
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
+
+from recipes.models import (
+    Favorite, Ingredient, IngredientAmount, Recipe, Shopping, Tag,
+)
 from users.models import Subscription, User
 
 
@@ -155,17 +157,18 @@ class RecipeSerializer(serializers.ModelSerializer):
             return False
         return Shopping.objects.filter(user=user, recipe=obj).exists()
 
-    @staticmethod
-    def add_ingredients(recipe, ingredients):
-        links = []
+    def add_ingredients(self, recipe, ingredients):
+        instances = []
         for ingredient in ingredients:
-            obj = Ingredient.objects.get(pk=ingredient.get('id'))
-            links.append(IngredientAmount(
+            obj = get_object_or_404(Ingredient,
+                                    pk=ingredient.get('id')
+                                    )
+            instances.append(IngredientAmount(
                 recipe=recipe,
                 ingredient=obj,
                 amount=ingredient.get('amount')
             ))
-        IngredientAmount.objects.bulk_create(links)
+        IngredientAmount.objects.bulk_create(instances)
 
 
 class ShortRecipeSerializer(RecipeSerializer):
@@ -213,3 +216,27 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj.author).count()
+
+
+class FollowSerializer(SubscriptionSerializer):
+    author = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+
+    class Meta:
+        fields = 'id', 'author', 'user'
+        model = Subscription
+
+    def validate(self, data):
+        get_object_or_404(User, username=data['author'])
+        if self.context['request'].user == data['author']:
+            raise ValidationError({
+                'errors': 'На себя подписываться нельзя.'
+            })
+        if Subscription.objects.filter(
+                user=self.context['request'].user,
+                author=data['author']
+        ):
+            raise ValidationError({
+                'errors': 'Вы уже подписаны.'
+            })
+        return data

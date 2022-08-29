@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models.constraints import UniqueConstraint
 
@@ -7,7 +8,7 @@ from users.models import User
 class Tag(models.Model):
     name = models.CharField(
         verbose_name='Тег',
-        max_length=200,
+        max_length=20,
         db_index=True,
         blank=False,
         unique=True
@@ -21,7 +22,7 @@ class Tag(models.Model):
     )
     slug = models.SlugField(
         verbose_name='Slug',
-        max_length=200,
+        max_length=20,
         blank=False,
         unique=True,
     )
@@ -32,7 +33,7 @@ class Tag(models.Model):
         verbose_name_plural = 'Теги'
 
     def __str__(self):
-        return f'{self.name}'
+        return self.name
 
 
 class Ingredient(models.Model):
@@ -44,7 +45,7 @@ class Ingredient(models.Model):
     )
     measurement_unit = models.CharField(
         verbose_name='Единица измерения',
-        max_length=200,
+        max_length=20,
         blank=False,
     )
 
@@ -54,7 +55,7 @@ class Ingredient(models.Model):
         verbose_name_plural = 'Ингредиенты'
 
     def __str__(self):
-        return f'{self.name}'
+        return self.name
 
 
 class Recipe(models.Model):
@@ -96,8 +97,13 @@ class Recipe(models.Model):
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления',
+        default=1,
         help_text='в минутах',
         blank=False,
+        validators=(
+            MinValueValidator(
+                1, message='Слишком быстро'),
+        ),
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата публикации',
@@ -117,7 +123,7 @@ class Recipe(models.Model):
         verbose_name_plural = 'Рецепты'
 
     def __str__(self):
-        return f'{self.name}'
+        return self.name
 
 
 class TagRecipe(models.Model):
@@ -134,7 +140,15 @@ class TagRecipe(models.Model):
     )
 
     class Meta:
+        verbose_name = 'Тег для рецепта'
         verbose_name_plural = 'Теги для рецептов'
+        constraints = [
+            UniqueConstraint(fields=['tag', 'recipe'],
+                             name='unique tag in recipes')
+        ]
+
+    def __str__(self):
+        return self.tag.name
 
 
 class IngredientAmount(models.Model):
@@ -150,14 +164,23 @@ class IngredientAmount(models.Model):
     amount = models.PositiveSmallIntegerField(
         verbose_name='Количество',
         default=1,
+        validators=(
+            MinValueValidator(
+                1, 'Укажите количество!'
+            ),
+        ),
     )
 
     class Meta:
+        verbose_name = 'Ингредиент для рецепта'
         verbose_name_plural = 'Ингредиенты для рецептов'
         constraints = [
             UniqueConstraint(fields=['ingredient', 'recipe'],
                              name='unique ingredients in recipes')
         ]
+
+    def __str__(self):
+        return self.amount, self.ingredient
 
 
 class Shopping(models.Model):

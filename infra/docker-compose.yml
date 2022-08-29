@@ -5,6 +5,11 @@ services:
     build:
       context: ../backend
       dockerfile: Dockerfile
+    command: >
+      bash -c "python manage.py makemigrations &&
+      python manage.py migrate &&
+      python manage.py collectstatic --noinput &&
+      gunicorn --bind 0:8000 foodgram.wsgi"
     volumes:
       - ../backend:/app/
       - static_value:/app/static/
