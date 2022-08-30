@@ -109,7 +109,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     'Ингредиент уже был добавлен')
             ingredient_list.append(ingredient)
-            if int(ingredient_item['amount']) < 0:
+            if int(float(ingredient_item['amount'])) < 0:
                 raise serializers.ValidationError({
                     'ingredients': 'Укажите количество'
                 })
@@ -124,7 +124,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe = Recipe.objects.create(author=request.user,
                                        **validated_data)
         recipe.tags.set(tags_data)
-        self.add_ingredients(recipe, ingredients_data)
+        self._add_ingredients(recipe, ingredients_data)
         return recipe
 
     def update(self, instance, validated_data):
@@ -139,7 +139,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         instance.tags.clear()
         instance.tags.set(tags_data)
         IngredientAmount.objects.filter(recipe=instance).delete()
-        self.add_ingredients(instance, ingredients)
+        self._add_ingredients(instance, ingredients)
         instance.save()
         return instance
 
@@ -157,7 +157,10 @@ class RecipeSerializer(serializers.ModelSerializer):
             return False
         return Shopping.objects.filter(user=user, recipe=obj).exists()
 
-    def add_ingredients(self, recipe, ingredients):
+    # > Почему метод перестал быть статичным?
+    # Не сразу понял про приватность и убрал статичность (
+    @staticmethod
+    def _add_ingredients(recipe, ingredients):
         instances = []
         for ingredient in ingredients:
             obj = get_object_or_404(Ingredient,
@@ -201,7 +204,8 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         fields = ('id', 'email', 'username', 'first_name', 'last_name',
                   'is_subscribed', 'recipes', 'recipes_count')
 
-    def get_is_subscribed(self, obj):
+    @staticmethod
+    def get_is_subscribed(obj):
         return Subscription.objects.filter(
             user=obj.user, author=obj.author
         ).exists()
@@ -214,7 +218,8 @@ class SubscriptionSerializer(serializers.ModelSerializer):
             queryset = queryset[:int(limit)]
         return ShortRecipeSerializer(queryset, many=True).data
 
-    def get_recipes_count(self, obj):
+    @staticmethod
+    def get_recipes_count(obj):
         return Recipe.objects.filter(author=obj.author).count()
 
 
@@ -240,3 +245,29 @@ class FollowSerializer(SubscriptionSerializer):
                 'errors': 'Вы уже подписаны.'
             })
         return data
+
+
+class ShoppingCartSerializer(serializers.ModelSerializer):
+    recipe = serializers.PrimaryKeyRelatedField(queryset=Recipe.objects.all())
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+
+    class Meta:
+        model = Shopping
+        fields = ('user', 'recipe')
+
+    def validate(self, data):
+        user = data['user']
+        recipe_id = data['recipe'].id
+        if Shopping.objects.filter(
+                user=user,
+                recipe__id=recipe_id
+        ).exists():
+            raise ValidationError({
+                'errors': 'Рецепт уже есть в списке покупок'
+            })
+        return data
+
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        context = {'request': request}
+        return ShortRecipeSerializer(instance.recipe, context=context).data
