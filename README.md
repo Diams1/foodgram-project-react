@@ -1,6 +1,10 @@
-# Foodgram - «Продуктовый помощник»
-
 ![Foodgram workflow](https://github.com/Diams1/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
+![docker_size](https://img.shields.io/docker/image-size/384134/foodgram_backend?label=Backend%20image%20size&style=flat)
+![size](https://img.shields.io/github/repo-size/Diams1/foodgram-project-react?style=flat)
+
+# Foodgram - «Продуктовый помощник»
+### Адрес сервиса: https://foodgram.servegame.com
+
 
 ## Стек технологий:  
 [![Python](https://img.shields.io/badge/-Python-464646?style=flat-square&logo=Python)](https://www.python.org/)
@@ -28,7 +32,7 @@ Foodgram - веб-сервис для публикации рецептов. З�
 По методологии CI/CD реализовано автоматическое тестирование кода, сборка в docker-контейнер и деплой образа на сервер.
 Триггером является команда ```push``` в репозиторий проекта  ветку ```master```, при этом запускаются:
 * Проверка кода на PEP8
-* Сборка и выгрузка образа backend- и fronend-части на <a href='https://hub.docker.com/'> DockerHub</a>
+* Сборка и выгрузка образа backend- и fronend-части в репозиторий <a href='https://hub.docker.com/'> DockerHub</a>
 * Деплой образа на сервер, выполнение миграций и сбор статики и запуск проекта
 * Отправка уведомления в телеграм об успешном завершении
 
