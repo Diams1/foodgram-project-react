@@ -140,8 +140,8 @@ class TagRecipe(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Тег для рецепта'
-        verbose_name_plural = 'Теги для рецептов'
+        verbose_name = 'тег'
+        verbose_name_plural = 'теги'
         constraints = [
             UniqueConstraint(fields=['tag', 'recipe'],
                              name='unique tag in recipes')
@@ -172,15 +172,15 @@ class IngredientAmount(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Ингредиент для рецепта'
-        verbose_name_plural = 'Ингредиенты для рецептов'
+        verbose_name = 'ингредиент'
+        verbose_name_plural = 'ингредиенты'
         constraints = [
             UniqueConstraint(fields=['ingredient', 'recipe'],
                              name='unique ingredients in recipes')
         ]
 
     def __str__(self):
-        return self.amount, self.ingredient
+        return f'{self.amount}, {self.ingredient}'
 
 
 class Shopping(models.Model):
