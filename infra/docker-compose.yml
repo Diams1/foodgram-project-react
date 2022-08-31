@@ -9,7 +9,7 @@ services:
       - ./.env
 
   backend:
-    image: 384134/foodgram_backend
+    image: 384134/foodgram_backend:latest
     restart: always
     command: >
       bash -c "python manage.py makemigrations &&
@@ -19,11 +19,13 @@ services:
     volumes:
       - static_value:/app/static/
       - media_value:/app/media/
+    depends_on:
+      - db
     env_file:
       - ./.env
 
   frontend:
-    image: 384134/foodgram_frontend
+    image: 384134/foodgram_frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
 
@@ -39,6 +41,7 @@ services:
       - ../docs/:/usr/share/nginx/html/api/docs/
     depends_on:
       - backend
+      - frontend
 
 volumes:
   static_value:
