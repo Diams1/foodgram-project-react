@@ -157,8 +157,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             return False
         return Shopping.objects.filter(user=user, recipe=obj).exists()
 
-    # > Почему метод перестал быть статичным?
-    # Не сразу понял про приватность и убрал статичность (
     @staticmethod
     def _add_ingredients(recipe, ingredients):
         instances = []
