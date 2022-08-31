@@ -3,8 +3,8 @@
 ![size](https://img.shields.io/github/repo-size/Diams1/foodgram-project-react?style=flat)
 
 # Foodgram - «Продуктовый помощник»
-### Адрес сервиса: https://foodgram.servegame.com
-
+### Адрес сервиса: http://foodgram.servegame.com
+#### Доступ к админке: fgadmin/root
 
 ## Стек технологий:  
 [![Python](https://img.shields.io/badge/-Python-464646?style=flat-square&logo=Python)](https://www.python.org/)
