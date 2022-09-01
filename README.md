@@ -69,15 +69,15 @@ sudo docker-compose up
 ```
 #### Импортируйте ингредиенты из CSV в БД (опционально) :
 ```bash
-docker-compose exec web python manage.py loader
+docker-compose exec backend python manage.py loader
 ```
 #### Импортируйте данные из бэкапа БД (опционально):
 ```bash
-docker-compose exec web python manage.py loaddata fixtures.json
+docker-compose exec backend python manage.py loaddata data/fixtures.json
 ```
 #### Создайте суперпользователя:
 ```bash
-docker-compose exec web python manage.py createsuperuser
+docker-compose exec backend python manage.py createsuperuser
 ```
 #### Для остановки контейнера выполните команду:
 ```bash
