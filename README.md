@@ -5,7 +5,7 @@
 # Foodgram - «Продуктовый помощник»
 ### Адрес сервиса: http://foodgram.servegame.com
 #### Доступ к админке:
-логин пароль: fgadmin/root
+логин / пароль: fgadmin / root  
 email: fgadmin@example.com
 
 ## Стек технологий:  
