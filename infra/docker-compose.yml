@@ -21,6 +21,7 @@ services:
       - media_value:/app/media/
     depends_on:
       - db
+    container_name: backend
     env_file:
       - ./.env
 
