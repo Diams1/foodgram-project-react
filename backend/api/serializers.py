@@ -109,7 +109,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     'Ингредиент уже был добавлен')
             ingredient_list.append(ingredient)
-            amount = str(ingredient_item['amount'].replace(',', '.'))
+            amount = str(ingredient_item['amount']).replace(',', '.')
             if float(int(amount)) < 0:
                 raise serializers.ValidationError({
                     'ingredients': 'Укажите количество'
